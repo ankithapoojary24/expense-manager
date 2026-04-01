@@ -1,6 +1,6 @@
-import numberValidator = require('../core/validators/number.validator');
-import type {Choice} from './interraction-manager';
-import type {openInterractionManager} from './interraction-manager';
+import { numberValidator } from '../core/validators/number.validator.js';
+import type {Choice} from './interaction-manager.js';
+import {openInterractionManager} from './interaction-manager.js';
 
 const options : Choice[] = [
     { label: 'Add Friend', value: '1' },
@@ -38,7 +38,8 @@ export const manageFriends = async () => {
         // }
         switch(choice!.value){
             case '1':
-                console.log('Adding friend...');    
+                console.log('Adding friend...');
+                await addFriend();    
                 break;
             case '2':
                 console.log('Searching friend...');                 
@@ -55,5 +56,5 @@ export const manageFriends = async () => {
                 return;
         }
     }
-}
-run();
+} 
+

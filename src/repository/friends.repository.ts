@@ -1,4 +1,9 @@
-import type { Friend } from "../models/friend.model";
+import type { Friend } from "../models/friend.model.js";
+
+interface PageOptions {
+    offset?: number;
+    limit?: number;
+}
 
 class FriendsRepository {
     private static instance: FriendsRepository;

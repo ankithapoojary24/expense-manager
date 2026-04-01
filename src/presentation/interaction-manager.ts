@@ -1,5 +1,5 @@
-import type * as readline from 'node:readline';
-const {stdin: input ,stdout: output} = require('node:process');
+import * as readline from 'node:readline';
+import { stdin as input, stdout as output } from 'node:process';
 
 export type ValidatorFn = (value : string) => boolean;
 //export type ValidatorFunctionConstructor =(errorMessage :string) => ValidatorFn;

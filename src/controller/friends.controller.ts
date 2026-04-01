@@ -1,4 +1,4 @@
-import type { Friend } from "../models/friend.model";
+import type { Friend } from "../models/friend.model.js";
 
 export class FriendsController {
     checkEmailExists(email: string){

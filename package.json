@@ -1,16 +1,27 @@
 {
-  "name": "expense-mgr",
+  "name": "expense-manager",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "CLI-based expense manager application",
+  "main": "dist/index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist"
   },
-  "keywords": [],
+  "keywords": [
+    "typescript",
+    "node",
+    "cli",
+    "expense-manager"
+  ],
   "author": "",
   "license": "ISC",
-  "description": "",
   "devDependencies": {
     "@types/node": "^25.5.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^6.0.2"
   }
 }

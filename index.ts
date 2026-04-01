@@ -1,8 +1,8 @@
-import {openInterractionManager} from './presentation/interraction-manager';
-import {manageFriends} from './presentation/connection-manager';
+import { manageFriends } from './src/presentation/friend-manager.js';
 
-const run = async () => {   
-    manageFriends();
-}
+const run = async () => {
+  console.log("Starting app...");   
+  await manageFriends();
+};
 
 run();

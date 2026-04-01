@@ -1,5 +1,5 @@
-import type {ValidatorFn} from './validator.type';
+import type {ValidatorFn} from './validator.type.js';
 
 export const numberValidator: ValidatorFn = (inout: string) => {
-    return !isNaN(+input);
+    return !isNaN(+inout);
 }
