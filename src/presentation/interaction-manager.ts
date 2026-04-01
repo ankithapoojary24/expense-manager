@@ -2,10 +2,9 @@ import * as readline from 'node:readline';
 import { stdin as input, stdout as output } from 'node:process';
 
 export type ValidatorFn = (value : string) => boolean;
-//export type ValidatorFunctionConstructor =(errorMessage :string) => ValidatorFn;
 
 export interface AskOptions {
-    defaultAnswer?: string|undefined; //always tell explicitly that the default answer is optional....dont do thisimplicitly using ?
+    defaultAnswer?: string|undefined; 
     validator?: ValidatorFn|undefined;
 }
 
@@ -13,14 +12,6 @@ export interface Choice {
     label: string;
     value: string;
 }
-//example
-// const genders : Choice[] = [
-//     { label: 'Food', value: 'FOOD' },
-//     { label: 'Transport', value: 'TRANSPORT' },
-//     { label: 'Entertainment', value: 'ENTERTAINMENT' },
-//     { label: 'Other', value: 'OTHER' },
-// ]
-
 export const openInterractionManager = () => {
     const rl = readline.createInterface({ input, output });
     const ask :(question: string, option?: AskOptions) => Promise<string| undefined> = async (question:string, option?:AskOptions)=>{
@@ -42,7 +33,7 @@ export const openInterractionManager = () => {
         });
        const choice = await ask('Please enter your choice:', { validator: (input) => {
             if (optional && input.trim() === '') {
-                return true; // Allow empty input if optional
+                return true; 
             }
             return choices.some(choice => choice.value === input);
         }});

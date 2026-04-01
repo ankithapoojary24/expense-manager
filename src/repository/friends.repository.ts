@@ -5,7 +5,7 @@ interface PageOptions {
     limit?: number;
 }
 
-class FriendsRepository {
+export class FriendsRepository {
     private static instance: FriendsRepository;
     private friends: Friend[] = [];
     static getInstance() {
@@ -33,5 +33,14 @@ class FriendsRepository {
             friend.email.toLowerCase().includes(lowerQuery) ||
             friend.phone.toLowerCase().includes(lowerQuery)
         ).slice((pageOptions?.offset || 0), (pageOptions?.offset || 0) + (pageOptions?.limit || 10));
+    }
+    removeFriends(query: string): Friend[] {
+    const repo = FriendsRepository.getInstance();
+    if (!repo) return [];
+    const matches = this.searchFriends(query, { offset: 0, limit: this.friends.length });
+    if (matches.length === 0) return [];
+    this.friends = this.friends.filter(f => !matches.includes(f));
+    console.log('Removed friends matching query:', query);
+    return matches;
     }
 }
