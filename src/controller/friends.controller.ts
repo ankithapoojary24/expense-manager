@@ -21,21 +21,19 @@ export class FriendsController {
     return this.repository.findFriendById(id);
   }
 
-  addFriend(friend: Friend) {
-    if (this.getFriendById(friend.id)) {
-      throw new ConflictError("Friend with this ID already exists", "id");
-    }
+addFriend(friend: Friend) {
+    const conflicts: string[] = [];
 
-    if (this.checkEmailExists(friend.email)) {
-      throw new ConflictError("Email already exists", "email");
-    }
+    if (this.getFriendById(friend.id)) conflicts.push("id");
+    if (this.checkEmailExists(friend.email)) conflicts.push("email");
+    if (this.checkPhoneExists(friend.phone)) conflicts.push("phone");
 
-    if (this.checkPhoneExists(friend.phone)) {
-      throw new ConflictError("Phone already exists", "phone");
+    if (conflicts.length > 0) {
+        throw new ConflictError("Friend has existing fields", conflicts);
     }
 
     this.repository.addFriend(friend);
-  }
+}
 
   searchFriend(query: string) {
     return this.repository.searchFriends(query);

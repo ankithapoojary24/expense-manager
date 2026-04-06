@@ -18,40 +18,50 @@ const {ask, choose, close} = openInterractionManager();
 const friendsController = new FriendsController();
 
 const addFriend = async () => {
-    const name = await ask('Enter friend name:');
-    const email = await ask('Enter friend email:');
-    const phone = await ask('Enter friend phone:');
-    const openingBalance = await ask(
-        'Enter opening balance (positive for amount you are owed, negative for amount you owe):', 
-        { defaultAnswer: '0', validator: numberValidator }
-    );
-    if (friendsController.checkEmailExists(email!)) {
-        console.log(`Email ${email} already exists.`);
-        return;
-    }
-    if (friendsController.checkPhoneExists(phone!)) {
-        console.log(`Phone ${phone} already exists.`);
-        return;
-    }
+    const showFriendForm = () => {
+        const friendFormData = {
+            name : '',
+            email: '',
+            phone: ''
+        };
 
-    const friend: Friend = {
-        id: Date.now().toString(),
-        name: name!,
-        email: email!,
-        phone: phone!,
-        balance: Number(openingBalance)
+        return {
+            async getValues(){
+                try{
+                    if (friendFormData.name === ''){
+                        friendFormData.name = await ask('Enter friend name:') || '';
+                    }
+                    if (friendFormData.email === ''){
+                        friendFormData.email = await ask('Enter friend email:') || '';
+                    }
+                    if (friendFormData.phone === ''){
+                        friendFormData.phone = await ask('Enter friend phone:') || '';
+                    }
+                    const {name, email, phone} = friendFormData;
+                    friendsController.addFriend({
+                        id: Date.now().toString(),
+                        name,
+                        email,
+                        phone,
+                        balance: 0, 
+                    });
+
+                }
+                catch(error:unknown){
+                    if (error instanceof ConflictError) {
+                        console.log(error.message);
+                        for(let key of error.conflictProperty){
+                            friendFormData[key as keyof typeof friendFormData] = '';
+                        }
+                        await this.getValues();
+                    }
+                }
+            },
+        };
     };
-    try {
-        await friendsController.addFriend(friend);
-        console.log(`Friend added: ${name}, ${email}, ${phone}`);
-    } catch (error) {
-        if (error instanceof ConflictError) {
-            console.log(`Conflict: ${error.message}`);
-        } else {
-            console.error('An unexpected error occurred.');
-        }
-    }
-}
+    const form = showFriendForm();
+    await form.getValues();   
+};
 
 const searchFriend = async () => {
     const query = await ask('Enter name to search:');

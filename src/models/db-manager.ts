@@ -19,7 +19,7 @@ export class AppDBManager {
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     if (!fs.existsSync(filePath)) fs.writeFileSync(filePath, JSON.stringify({ friends: [] }));
 
-    this.db = new Database<AppData>(filePath, JsonAdapter);
+    this.db = new Database<AppData>(filePath, new JsonStorageAdapter<AppData>());
   }
 
   static getInstance(): AppDBManager {
