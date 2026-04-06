@@ -21,12 +21,11 @@ const addFriend = async () => {
     const name = await ask('Enter friend name:');
     const email = await ask('Enter friend email:');
     const phone = await ask('Enter friend phone:');
-    const address = await ask('Enter friend address:');
     const openingBalance = await ask(
         'Enter opening balance (positive for amount you are owed, negative for amount you owe):', 
         { defaultAnswer: '0', validator: numberValidator }
     );
-    if (friendsController.checkemailExists(email!)) {
+    if (friendsController.checkEmailExists(email!)) {
         console.log(`Email ${email} already exists.`);
         return;
     }
@@ -40,7 +39,6 @@ const addFriend = async () => {
         name: name!,
         email: email!,
         phone: phone!,
-        address: address!,
         balance: Number(openingBalance)
     };
     try {

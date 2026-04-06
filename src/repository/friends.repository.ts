@@ -7,9 +7,14 @@ interface PageOptions {
 }
 
 export class FriendsRepository {
-  private static instance: FriendsRepository;
-  private friends: Friend[] = [];
+  private static instance: FriendsRepository | null = null;
+  friends: Friend[];
   private dbManager = AppDBManager.getInstance();
+
+  private constructor() {
+    const db = this.dbManager.getDB();
+    this.friends = db.table("friends") as Friend[];
+  }
 
   static getInstance() {
     if (!FriendsRepository.instance) {
@@ -18,16 +23,21 @@ export class FriendsRepository {
     return FriendsRepository.instance;
   }
 
-  private constructor() {
-    const db = this.dbManager.getDB();
-    this.friends = db.table("friends") as Friend[];
-  }
 
   addFriend(friend: Friend) {
+    if (this.friends.find(f => f.id === friend.id)) {
+        console.log('Friend already exists:', friend.id);
+        return;
+    }
+
+    friend.name = friend.name || "";
+    friend.email = friend.email || "";
+    friend.phone = friend.phone || "";
+
     this.friends.push(friend);
     this.dbManager.save();
-    console.log('Friend added to repository', friend);
-  }
+    console.log('Friend added:', friend);
+    }
 
   findFriendByEmail(email: string) {
     return this.friends.find(friend => friend.email === email);
@@ -44,16 +54,16 @@ export class FriendsRepository {
   searchFriends(query: string, pageOptions?: PageOptions) {
     const lowerQuery = query.toLowerCase();
     return this.friends
-      .filter(friend =>
-        friend.name.toLowerCase().includes(lowerQuery) ||
-        friend.email.toLowerCase().includes(lowerQuery) ||
-        friend.phone.toLowerCase().includes(lowerQuery)
-      )
-      .slice(
+        .filter(friend =>
+        (friend.name?.toLowerCase().includes(lowerQuery) || false) ||
+        (friend.email?.toLowerCase().includes(lowerQuery) || false) ||
+        (friend.phone?.toLowerCase().includes(lowerQuery) || false)
+        )
+        .slice(
         pageOptions?.offset || 0,
         (pageOptions?.offset || 0) + (pageOptions?.limit || 10)
-      );
-  }
+        );
+    }
 
   removeFriends(query: string): Friend[] {
     const matches = this.searchFriends(query, { offset: 0, limit: this.friends.length });

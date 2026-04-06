@@ -6,35 +6,33 @@ export type Row = Record<string, ColumnData>; // name: "", email: "am@email.com"
 
 type Table = Row[];
 
-export type Dataset = {
-  [key: string]: Table;   //index signature
-};
-export interface DatabaseStorageAdapter {
-  parse: (content: string) => Dataset;
-  serialize: (dataset: Dataset) => string;
+export interface DatabaseStorageAdapter<T> {
+  parse: (content: string) => T;
+  serialize: (dataset: T) => string;
 }
 
-export const JsonAdapter: DatabaseStorageAdapter = {
-  parse(content: string) {
+export class JsonStorageAdapter<T> implements DatabaseStorageAdapter<T> {
+  parse(content: string): T {
     try {
-      return JSON.parse(content);
+      return JSON.parse(content) as T;
     } catch (e) {
       console.error(
-        'Given filePath is not empty and its content is not valid JSON.',
+        'Given filePath is not empty and its content is not valid JSON.'
       );
       throw e;
     }
-  },
-  serialize(dataset: Dataset) {
+  }
+
+  serialize(dataset: T): string {
     return JSON.stringify(dataset);
-  },
-};
+  }
+}
 
 export class Database<T extends {[K in keyof T]: Table}> {
   private readonly dataStore: T = {} as T;
   constructor(
     private readonly filePath: string,
-    private readonly adapter: DatabaseStorageAdapter = JsonAdapter,
+    private readonly adapter: DatabaseStorageAdapter<T> =new JsonStorageAdapter<T>()
   ) {
     if (!filePath) {
       throw new Error('Missing file path argument.');

@@ -1,9 +1,9 @@
-import { Database, type Dataset, JsonAdapter } from '../core/storage/db.js';
+import { Database, JsonStorageAdapter } from '../core/storage/db.js';
 import type { Friend } from './friend.model.js';
 import fs from 'fs';
 import path from 'path';
 
-interface AppData extends Dataset {
+interface AppData {
   friends: Friend[];
 }
 
