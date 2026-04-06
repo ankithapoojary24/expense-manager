@@ -3,6 +3,7 @@ import type {Choice} from './interaction-manager.js';
 import {openInterractionManager} from './interaction-manager.js';
 import {Friend} from '../models/friend.model.js';
 import {FriendsController} from '../controller/friends.controller.js';
+import { ConflictError } from '../core/errors/conflict.error.js';
 
 const options : Choice[] = [
     { label: 'Add Friend', value: '1' },
@@ -20,11 +21,12 @@ const addFriend = async () => {
     const name = await ask('Enter friend name:');
     const email = await ask('Enter friend email:');
     const phone = await ask('Enter friend phone:');
+    const address = await ask('Enter friend address:');
     const openingBalance = await ask(
         'Enter opening balance (positive for amount you are owed, negative for amount you owe):', 
         { defaultAnswer: '0', validator: numberValidator }
     );
-    if (friendsController.checkEmailExists(email!)) {
+    if (friendsController.checkemailExists(email!)) {
         console.log(`Email ${email} already exists.`);
         return;
     }
@@ -38,14 +40,18 @@ const addFriend = async () => {
         name: name!,
         email: email!,
         phone: phone!,
+        address: address!,
         balance: Number(openingBalance)
     };
-
-    const result = friendsController.addFriend(friend);
-    if (result?.success === false) {
-        console.log('Failed to add friend. Repository not available.');
-    } else {
+    try {
+        await friendsController.addFriend(friend);
         console.log(`Friend added: ${name}, ${email}, ${phone}`);
+    } catch (error) {
+        if (error instanceof ConflictError) {
+            console.log(`Conflict: ${error.message}`);
+        } else {
+            console.error('An unexpected error occurred.');
+        }
     }
 }
 

@@ -1,19 +1,28 @@
 import type { Friend } from "../models/friend.model.js";
 import { FriendsRepository } from "../repository/friends.repository.js";
-
+import { ConflictError } from "../core/errors/conflict.error.js";
+//need abstract class that does most of the things in nature,dont come up with heirarchy
 export class FriendsController {
-    checkEmailExists(email: string){
-        return false;
+    private repository: FriendsRepository;
+    constructor() {
+        this.repository = FriendsRepository.getInstance();
+    }
+    checkemailExists(email: string){
+        return this.repository.findFriendByEmail(email) !== undefined;
     }
     checkPhoneExists(phone: string){
-        return false;
+        return this.repository.findFriendByPhone(phone) !== undefined;
     }
-    addFriend(friend:Friend){
-        if(!FriendsRepository.getInstance()){
-            return {success:false}
+    getFriendbyId(id: string){
+        return this.repository.findFriendById(id);
+    }
+    addFriend(friend: Friend) {
+        if (this.getFriendbyId(friend.id)) {
+            throw new ConflictError("Friend with this ID already exists", "id");
         }
-        console.log('Adding friend to database...',friend)
-        FriendsRepository.getInstance().addFriend(friend);
+
+        console.log('Adding friend to database...', friend);
+        this.repository.addFriend(friend);
     }
     searchFriend(query: string) {
     if (!FriendsRepository.getInstance()) {

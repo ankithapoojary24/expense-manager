@@ -1,4 +1,6 @@
-export interface Friend {
+import { Row } from "../core/storage/db.js";
+
+export interface Friend extends Row{
     id: string;
     name: string;
     email: string;
