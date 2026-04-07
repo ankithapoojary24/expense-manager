@@ -1,20 +1,12 @@
 import type { Friend } from "../models/friend.model.js";
+import type { PageOptions } from "../core/pagination/pagination.types.js";
 import { AppDBManager } from "../models/db-manager.js";
-
-interface PageOptions {
-  offset?: number;
-  limit?: number;
-}
 
 export class FriendsRepository {
   private static instance: FriendsRepository | null = null;
-  friends: Friend[];
   private dbManager = AppDBManager.getInstance();
 
-  private constructor() {
-    const db = this.dbManager.getDB();
-    this.friends = db.table("friends") as Friend[];
-  }
+  private constructor() {}
 
   static getInstance() {
     if (!FriendsRepository.instance) {
@@ -23,21 +15,20 @@ export class FriendsRepository {
     return FriendsRepository.instance;
   }
 
+  private get friends(): Friend[] {
+    return this.dbManager.getDB().table("friends") as Friend[];
+  }
 
-  addFriend(friend: Friend) {
+  async addFriend(friend: Friend) {
     if (this.friends.find(f => f.id === friend.id)) {
-        console.log('Friend already exists:', friend.id);
-        return;
+      console.log('Friend already exists:', friend.id);
+      return;
     }
-
-    friend.name = friend.name || "";
-    friend.email = friend.email || "";
-    friend.phone = friend.phone || "";
 
     this.friends.push(friend);
-    this.dbManager.save();
+    await this.dbManager.save();
     console.log('Friend added:', friend);
-    }
+  }
 
   findFriendByEmail(email: string) {
     return this.friends.find(friend => friend.email === email);
@@ -51,30 +42,47 @@ export class FriendsRepository {
     return this.friends.find(friend => friend.id === id);
   }
 
+  getAllFriends(): Friend[] {
+    return this.friends;
+  }
+
   searchFriends(query: string, pageOptions?: PageOptions) {
     const lowerQuery = query.toLowerCase();
-    return this.friends
-        .filter(friend =>
-        (friend.name?.toLowerCase().includes(lowerQuery) || false) ||
-        (friend.email?.toLowerCase().includes(lowerQuery) || false) ||
-        (friend.phone?.toLowerCase().includes(lowerQuery) || false)
-        )
-        .slice(
-        pageOptions?.offset || 0,
-        (pageOptions?.offset || 0) + (pageOptions?.limit || 10)
-        );
-    }
 
-  removeFriends(query: string): Friend[] {
-    const matches = this.searchFriends(query, { offset: 0, limit: this.friends.length });
-    if (matches.length === 0) return [];
-    this.friends = this.friends.filter(f => !matches.includes(f));
-    const db = this.dbManager.getDB();
-    const table = db.table("friends") as Friend[];
-    table.length = 0;
-    table.push(...this.friends);
-    this.dbManager.save();
-    console.log('Removed friends matching query:', query);
-    return matches;
+    const offset = pageOptions?.offset ?? 0;
+    const limit = pageOptions?.limit ?? 10;
+
+    const filtered = this.friends.filter(friend =>
+      (friend.name?.toLowerCase().includes(lowerQuery) || false) ||
+      (friend.email?.toLowerCase().includes(lowerQuery) || false) ||
+      (friend.phone?.includes(lowerQuery) || false)
+    );
+
+    return {
+      total: filtered.length,
+      data: filtered.slice(offset, offset + limit),
+    };
+  }
+
+  async updateFriend(id: string, updated: Partial<Friend>): Promise<boolean> {
+    const index = this.friends.findIndex(f => f.id === id);
+    if (index === -1) return false;
+
+    this.friends[index] = {
+      ...this.friends[index],
+      ...updated,
+    } as Friend;
+
+    await this.dbManager.save();
+    return true;
+  }
+
+  async deleteFriend(id: string): Promise<boolean> {
+    const index = this.friends.findIndex(f => f.id === id);
+    if (index === -1) return false;
+
+    this.friends.splice(index, 1);
+    await this.dbManager.save();
+    return true;
   }
 }

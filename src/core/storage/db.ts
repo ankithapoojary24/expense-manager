@@ -29,7 +29,7 @@ export class JsonStorageAdapter<T> implements DatabaseStorageAdapter<T> {
 }
 
 export class Database<T extends {[K in keyof T]: Table}> {
-  private readonly dataStore: T = {} as T;
+  private dataStore: T = {} as T;
   constructor(
     private readonly filePath: string,
     private readonly adapter: DatabaseStorageAdapter<T> =new JsonStorageAdapter<T>()

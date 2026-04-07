@@ -17,10 +17,10 @@ export const openInterractionManager = () => {
     const ask :(question: string, option?: AskOptions) => Promise<string| undefined> = async (question:string, option?:AskOptions)=>{
     const { defaultAnswer, validator } = option || {};
         return new Promise((resolve) => {
-            rl.question(question + ` ${defaultAnswer ? '(' + defaultAnswer + ')' : ''}`, (answer:string) => {
+            rl.question(question + ` ${defaultAnswer ? '(' + defaultAnswer + ')' : ''}`, async (answer:string) => {
                 if (validator && !validator(answer)) {
                     console.log('Invalid input. Please try again.');
-                    return resolve(ask(question, { defaultAnswer, validator }));
+                    return resolve(await ask(question, { defaultAnswer, validator }));
                 }
                 resolve(answer || defaultAnswer);
             });
@@ -37,7 +37,9 @@ export const openInterractionManager = () => {
             }
             return choices.some(choice => choice.value === input);
         }});
-        return choices.find(c =>c.value === choice);
+        if (!choice) return undefined;
+        const selected = choices.find(c => c.value === choice);
+        return selected;
     }
     const close = () => {
         rl.close();

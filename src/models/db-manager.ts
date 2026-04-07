@@ -12,11 +12,9 @@ export class AppDBManager {
   private db: Database<AppData>;
 
   private constructor() {
-    const filePath = path.resolve('./data/data.json');
+    const filePath = path.join(process.cwd(), 'data', 'data.json');
 
     // Ensure file exists
-    const dir = path.dirname(filePath);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     if (!fs.existsSync(filePath)) fs.writeFileSync(filePath, JSON.stringify({ friends: [] }));
 
     this.db = new Database<AppData>(filePath, new JsonStorageAdapter<AppData>());
@@ -29,7 +27,7 @@ export class AppDBManager {
     return this.sharedInstance;
   }
 
-  getDB() {
+  getDB(): Database<AppData>  {
     return this.db;
   }
 
