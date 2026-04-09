@@ -1,0 +1,35 @@
+# Build Stage
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy dependency files
+COPY package.json package-lock.json tsconfig.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN npm run build
+
+# Production Stage
+FROM node:20-alpine AS production
+
+WORKDIR /app
+
+ENV PORT=3000
+ENV NODE_ENV=production
+
+# Copy only built files and dependencies from builder stage
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package.json ./package.json
+
+RUN mkdir -p data && echo "[]" > data/data.json
+
+EXPOSE 3000
+
+CMD ["node", "dist/index.js"]
