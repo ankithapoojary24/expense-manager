@@ -1,1 +1,0 @@
-{"version":3,"file":"friends.controller.js","sourceRoot":"","sources":["../../src/controller/friends.controller.ts"],"names":[],"mappings":"AAEA,MAAM,OAAO,iBAAiB;IAC1B,gBAAgB,CAAC,KAAa;QAC1B,OAAO,KAAK,CAAC;IACjB,CAAC;IACD,gBAAgB,CAAC,KAAa;QAC1B,OAAO,KAAK,CAAC;IACjB,CAAC;IACD,SAAS,CAAC,MAAc;QACpB,OAAO,CAAC,GAAG,CAAC,8BAA8B,EAAE,MAAM,CAAC,CAAC;IACxD,CAAC;CACJ"}
