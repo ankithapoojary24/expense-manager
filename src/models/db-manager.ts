@@ -13,24 +13,18 @@ export class AppDBManager {
 
   private constructor() {
     const filePath = path.join(process.cwd(), 'data', 'data.json');
-
-    // Ensure file exists
     if (!fs.existsSync(filePath)) fs.writeFileSync(filePath, JSON.stringify({ friends: [] }));
-
     this.db = new Database<AppData>(filePath, new JsonStorageAdapter<AppData>());
   }
-
   static getInstance(): AppDBManager {
     if (!this.sharedInstance) {
       this.sharedInstance = new AppDBManager();
     }
     return this.sharedInstance;
   }
-
   getDB(): Database<AppData>  {
     return this.db;
   }
-
   async save() {
     await this.db.save();
   }
